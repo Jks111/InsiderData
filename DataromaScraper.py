@@ -18,6 +18,8 @@ def scrape_insider_data():
         print("Failed to load")
         return []
 
+    print("Scraper running...")
+    
     soup = BeautifulSoup(response.text, "html.parser")
 
     table = soup.find("table", id="grid")
@@ -28,11 +30,14 @@ def scrape_insider_data():
 
     rows = table.find_all("tr")
 
-    print(f"Found {len(rows)} rows.")
+    data_rows = rows[1:]  # skip header
+    limit = min(50, len(data_rows))
+
+    print(f"Processing {limit} rows.")
 
     data = []
 
-    for i, row in enumerate(rows[:5]):  # limit to first 5 for testing
+    for row in data_rows[:limit]:
         symbol = row.find("td", class_="iss_sym")
         company = row.find("td", class_="iss_name")
         insider = row.find("td", class_="rep_name")
@@ -42,10 +47,10 @@ def scrape_insider_data():
         shares = row.find("td", class_="sh")
         price = row.find("td", class_="pr")
         amount = row.find("td", class_="amt")
-        ownership = row.find("td", class_="dir_ind")
+
+        if not symbol:
+            continue
         
-        print("RAW trade_code HTML:", trade_code)
-        print("RAW text:", repr(trade_code.text))
         
         try:
             clean_amount = float(amount.text.strip().replace(",", ""))
@@ -56,19 +61,18 @@ def scrape_insider_data():
             trade_type = trade_code.text.strip()
         else: trade_type = "Error"
     
-          
-        print("\n--- ROW DEBUG ---")
-        print("Symbol:", symbol.text.strip())
-        print("Company:", company.text.strip())
-        print("Insider:", insider.text.strip())
-        print("Relation:", relation.text.strip())
-        print("Date:", date.text.strip())
-        print("Trade Code:", trade_code.text.strip())
-        print("Shares:", shares.text.strip())
-        print("Price:", price.text.strip())
-        print("Amount:", amount.text.strip())
-
-        # Clean numeric fields
+        
+        # print("\n--- ROW DEBUG ---")
+        # print("Symbol:", symbol.text.strip())
+        # print("Company:", company.text.strip())
+        # print("Insider:", insider.text.strip())
+        # print("Relation:", relation.text.strip())
+        # print("Date:", date.text.strip())
+        # print("Trade Code:", trade_code.text.strip())
+        # print("Shares:", shares.text.strip())
+        # print("Price:", price.text.strip())
+        # print("Amount:", amount.text.strip())
+        
         try:
             clean_price = float(price.text.strip().replace(",", ""))
             clean_shares = int(shares.text.strip().replace(",", ""))
@@ -83,20 +87,12 @@ def scrape_insider_data():
             "relation": relation.text.strip(),
             "date": date.text.strip(),
             "price": clean_price,
-            "Purchase/Sale": trade_type,
+            "trade_type": trade_type,
             "shares": clean_shares,
-            "Total price": clean_amount
+            "amount": clean_amount
         })
 
     print("\nScraping finished.")
     print(f"Parsed {len(data)} valid rows.")
 
     return data
-
-
-if __name__ == "__main__":
-    results = scrape_insider_data()
-
-    print("\n=== FINAL CLEAN OUTPUT ===")
-    for r in results:
-        print(r)
