@@ -75,9 +75,10 @@ def scrape_insider_data():
         
         try:
             clean_price = float(price.text.strip().replace(",", ""))
-            clean_shares = int(shares.text.strip().replace(",", ""))
+            clean_shares = float(shares.text.strip().replace(",", ""))
+            clean_amount = float(amount.text.strip().replace(",", ""))
         except:
-            print("Numeric conversion failed.")
+            print("Numeric conversion failed for row:", symbol.text.strip())
             continue
 
         data.append({
