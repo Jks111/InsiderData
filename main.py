@@ -1,6 +1,6 @@
-from DataromaScraper import scrape_insider_data
-from simulator import simulate_grouped_trades
-from database import init_db, insert_simulation
+from insider_tracker.scraper import scrape_insider_data
+from insider_tracker.simulator import simulate_grouped_trades
+from insider_tracker.database import init_db, insert_simulation
 
 
 def main():
@@ -32,6 +32,8 @@ def main():
 
     # Store in DB
     for trade in simulated:
+        
+        print(trade)
         insert_simulation(trade)
 
     print("All simulations stored in database.")
