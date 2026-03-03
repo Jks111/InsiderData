@@ -1,7 +1,9 @@
 import sqlite3
 from datetime import datetime
+import os
 
-DB_NAME = "insider_data.db"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_NAME = os.path.join(BASE_DIR, "insider_data.db")
 
 
 def init_db():
@@ -53,6 +55,11 @@ def insert_simulation(data: dict):
         data["total_insider_shares"],
         datetime.utcnow().isoformat()
     ))
+    
+    if cursor.rowcount == 0:
+        print("IGNORED:", data["symbol"], data["insider"])
+    else:
+        print("INSERTED:", data["symbol"], data["insider"])
 
     conn.commit()
     conn.close()
