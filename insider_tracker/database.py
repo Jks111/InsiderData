@@ -100,13 +100,14 @@ def init_db():
         capital_used REAL,
         total_insider_shares REAL,
         current_price REAL,
+        currency TEXT,
         current_value REAL,
         profit REAL,
         return_pct REAL,
         snapshot_date TEXT NOT NULL,
         created_at TEXT,
         UNIQUE(symbol, insider, snapshot_date)
-    )
+)
     """)
 
     conn.commit()
@@ -129,13 +130,14 @@ def insert_simulation(data: dict):
         capital_used,
         total_insider_shares,
         current_price,
+        currency,
         current_value,
         profit,
         return_pct,
         snapshot_date,
         created_at
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         data["symbol"],
         data["insider"],
@@ -145,6 +147,7 @@ def insert_simulation(data: dict):
         data["capital_used"],
         data["total_insider_shares"],
         data["current_price"],
+        data["currency"],
         data["current_value"],
         data["profit"],
         data["return_pct"],

@@ -26,7 +26,24 @@ def simulate_grouped_trades(trades: list, capital: float = 1000.0):
         weighted_avg_price = total_amount / total_shares
         simulated_shares = capital / weighted_avg_price
 
-        current_price = get_current_price(symbol)
+        current_price, currency = get_current_price(symbol)
+
+        current_price, currency = get_current_price(symbol)
+
+        # Skip if price fetch failed
+        if current_price is None:
+            print("\nSKIPPED (No Market Price Found)")
+            print("Symbol:", symbol)
+            print("Insider:", insider)
+            print("Company:", trade_list[0]["company"])
+            continue
+
+        # Skip non-USD assets (future proofing)
+        if currency != "USD":
+            print("\nSKIPPED (Non-USD Asset)")
+            print("Symbol:", symbol)
+            print("Currency:", currency)
+            continue
 
         if current_price:
             current_value = simulated_shares * current_price
@@ -46,6 +63,7 @@ def simulate_grouped_trades(trades: list, capital: float = 1000.0):
             "simulated_shares": round(simulated_shares, 6),
             "capital_used": capital,
             "current_price": current_price,
+            "currency": currency,
             "current_value": round(current_value, 2) if current_value else None,
             "profit": round(profit, 2) if profit else None,
             "return_pct": round(return_pct, 2) if return_pct else None
